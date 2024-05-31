@@ -2,7 +2,7 @@
 A new role for TTT2.
 
 The Decipherer is a new Detective variant.
-His special ability is that he spawns with the WH-B3 Minitester.
+His special ability is that he spawns with the WH-B3 Minitester instead of the DNA Scanner.
 
 The WH-B3 Minitester has the powerful ability to confirm peoples roles, similar to a Traitor Tester found on maps.
 However, it has limited ammo and two long (configurable) cooldowns.
