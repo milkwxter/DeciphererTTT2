@@ -12,7 +12,7 @@ if CLIENT then
 
   SWEP.EquipMenuData = {
     type = "item_weapon",
-    name = "Decipherer's Minitester",
+    name = "WH-B3 Minitester",
     desc = "deci_minitester_desc"
   }
 
@@ -76,19 +76,26 @@ function SWEP:PrimaryAttack()
     if hitEnt:IsPlayer() then
       -- Check if the minitester is still charging
       if not timer.Exists( "ttt2_decitester_cooldown" ) then
-        -- Get the player that was hit and the client
-		-- Writes the player via network
-		local hitPlayer = hitEnt
-		hook.Run("TTTGetDeciPly",hitPlayer)
-		net.Receive("ttt2_deci_hit_ply", function(len)
-			local hitString = net.ReadString()
-			local hitColor = net.ReadColor()
-			local teamStr = hitPlayer:GetName() .. " has been deciphered as a " .. hitString
-			local client = self:GetOwner()
-			local clientColor = client:GetRoleColor()
-			-- Send a message to the client
-			EPOP:AddMessage({text = "Minitester results are in!", color = clientColor}, {text = teamStr, color = hitColor}, 6, nil, true)
-		end)
+        -- Get the player that was hit
+        local hitPlayer = hitEnt
+
+        -- Run a hook to recieve important information from the server
+        hook.Run("TTTGetDeciPly",hitPlayer)
+
+        -- Recieve important information from the server
+        net.Receive("ttt2_deci_hit_ply", function(len)
+          -- Collect information from the server
+          local hitString = net.ReadString()
+          local hitColor = net.ReadColor()
+
+          -- Create our string and get another color
+          local teamStr = hitPlayer:GetName() .. " has been deciphered as a " .. hitString
+          local client = self:GetOwner()
+          local clientColor = client:GetRoleColor()
+
+          -- Send a message to the client with relevant information
+          EPOP:AddMessage({text = "Minitester results are in!", color = clientColor}, {text = teamStr, color = hitColor}, 6, nil, true)
+        end)
 
         --Start the recharging timer
         STATUS:AddTimedStatus(self:GetOwner(), "ttt2_deci_cooldown_stat", GetConVar("ttt2_decitester_charge_time"):GetInt(), true)
