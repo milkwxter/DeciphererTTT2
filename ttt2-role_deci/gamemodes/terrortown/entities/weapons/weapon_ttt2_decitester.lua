@@ -1,5 +1,6 @@
 if SERVER then
     AddCSLuaFile()
+	util.AddNetworkString("ttt2_deci_hit_ply")
 end
 
 SWEP.Base = "weapon_tttbase"
@@ -76,16 +77,18 @@ function SWEP:PrimaryAttack()
       -- Check if the minitester is still charging
       if not timer.Exists( "ttt2_decitester_cooldown" ) then
         -- Get the player that was hit and the client
-        local hitPlayer = hitEnt
-        local client = self:GetOwner()
-
-        -- Create a string and gather colors
-        local teamStr = hitPlayer:GetName() .. " has been deciphered as a " .. hitPlayer:GetRoleString()
-        local hitColor = hitPlayer:GetRoleColor()
-        local clientColor = client:GetRoleColor()
-
-        -- Send a message to the client
-        EPOP:AddMessage({text = "Minitester results are in!", color = clientColor}, {text = teamStr, color = hitColor}, 6, nil, true)
+		-- Writes the player via network
+		local hitPlayer = hitEnt
+		hook.Run("TTTGetDeciPly",hitPlayer)
+		net.Receive("ttt2_deci_hit_ply", function(len)
+			local hitString = net.ReadString()
+			local hitColor = net.ReadColor()
+			local teamStr = hitPlayer:GetName() .. " has been deciphered as a " .. hitString
+			local client = self:GetOwner()
+			local clientColor = client:GetRoleColor()
+			-- Send a message to the client
+			EPOP:AddMessage({text = "Minitester results are in!", color = clientColor}, {text = teamStr, color = hitColor}, 6, nil, true)
+		end)
 
         --Start the recharging timer
         STATUS:AddTimedStatus(self:GetOwner(), "ttt2_deci_cooldown_stat", GetConVar("ttt2_decitester_charge_time"):GetInt(), true)
