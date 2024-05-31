@@ -1,4 +1,4 @@
-CreateConVar("ttt2_decitester_charge_time", 40, {FCVAR_ARCHIVE, FCVAR_NOTIFY})
+CreateConVar("ttt2_decitester_charge_time", 30, {FCVAR_ARCHIVE, FCVAR_NOTIFY})
 CreateConVar("ttt2_decitester_confirm_time", 10, {FCVAR_ARCHIVE, FCVAR_NOTIFY})
 
 
@@ -11,7 +11,7 @@ table.insert(tbl[ROLE_DECIPHERER], {
       min = 5,
       max = 120,
       decimal = 0,
-      desc = "ttt2_decitester_charge_time (def. 40)"
+      desc = "ttt2_decitester_charge_time (def. 30)"
 })
 
 table.insert(tbl[ROLE_DECIPHERER], {

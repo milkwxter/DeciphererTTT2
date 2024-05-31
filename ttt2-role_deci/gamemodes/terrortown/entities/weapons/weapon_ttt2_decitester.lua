@@ -33,7 +33,7 @@ SWEP.LimitedStock = true
 
 SWEP.Primary.Recoil = 0
 SWEP.Primary.ClipSize = 3
-SWEP.Primary.DefaultClip = 1
+SWEP.Primary.DefaultClip = 3
 SWEP.Primary.Automatic = false
 SWEP.Primary.Delay = 1
 SWEP.Primary.Ammo = "none"
@@ -73,17 +73,25 @@ function SWEP:PrimaryAttack()
   if IsValid(hitEnt) then
     -- Check if that entity was a player
     if hitEnt:IsPlayer() then
-      -- Get the player that was hit and the client
-      local hitPlayer = hitEnt
-      local client = self:GetOwner()
+      -- Check if the minitester is still charging
+      if not timer.Exists( "ttt2_decitester_cooldown" ) then
+        -- Get the player that was hit and the client
+        local hitPlayer = hitEnt
+        local client = self:GetOwner()
 
-      -- Create a string and gather colors
-      local teamStr = hitPlayer:GetName() .. " has been deciphered as a " .. hitPlayer:GetRoleString()
-      local hitColor = hitPlayer:GetRoleColor()
-      local clientColor = client:GetRoleColor()
+        -- Create a string and gather colors
+        local teamStr = hitPlayer:GetName() .. " has been deciphered as a " .. hitPlayer:GetRoleString()
+        local hitColor = hitPlayer:GetRoleColor()
+        local clientColor = client:GetRoleColor()
 
-      -- Send a message to the client
-      EPOP:AddMessage({text = "Minitester results are in!", color = clientColor}, {text = teamStr, color = hitColor}, 6, nil, true)
+        -- Send a message to the client
+        EPOP:AddMessage({text = "Minitester results are in!", color = clientColor}, {text = teamStr, color = hitColor}, 6, nil, true)
+
+        --Start the recharging timer
+        STATUS:AddTimedStatus(self:GetOwner(), "ttt2_deci_cooldown_stat", GetConVar("ttt2_decitester_charge_time"):GetInt(), true)
+          timer.Create("ttt2_decitester_cooldown", GetConVar("ttt2_decitester_charge_time"):GetInt(), 1, function()
+        end)
+      end
     end
   end
 end
