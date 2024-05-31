@@ -48,6 +48,11 @@ end
 
 -- Override original primary attack
 function SWEP:PrimaryAttack()
+  -- Check if we are out of ammo
+  if self:Clip1() <= 0 then
+    return
+  end
+  
   -- Melee attack code
   self:SetNextPrimaryFire( CurTime() + self.Primary.Delay )
   
@@ -76,12 +81,21 @@ function SWEP:PrimaryAttack()
     if hitEnt:IsPlayer() then
       -- Check if the minitester is still charging
       if not timer.Exists( "ttt2_decitester_cooldown" ) then
+        -- Play a sound to signal timer started
+        EmitSound( "buttons/button5.wav", self:GetOwner():GetPos() )
+        self:SendWeaponAnim( ACT_VM_PRIMARYATTACK)
+
+        -- Deduct ammo
+        self:TakePrimaryAmmo( 1 )
+
         -- Get the player that was hit
         local hitPlayer = hitEnt
 
+        -- Start the results timer (when its up, we get the results of the test)
+        STATUS:AddTimedStatus(self:GetOwner(), "ttt2_deci_results_timer_stat", GetConVar("ttt2_decitester_confirm_time"):GetInt(), true)
         -- Run a hook to recieve important information from the server
-        hook.Run("TTTGetDeciPly",hitPlayer)
-
+        timer.Create("ttt2_decitester_results_timer", GetConVar("ttt2_decitester_confirm_time"):GetInt(), 1, function() hook.Run("TTTGetDeciPly", hitPlayer) end)
+        
         -- Recieve important information from the server
         net.Receive("ttt2_deci_hit_ply", function(len)
           -- Collect information from the server
@@ -95,12 +109,20 @@ function SWEP:PrimaryAttack()
 
           -- Send a message to the client with relevant information
           EPOP:AddMessage({text = "Minitester results are in!", color = clientColor}, {text = teamStr, color = hitColor}, 6, nil, true)
+
+          -- Play a sound to signal timer finished
+          surface.PlaySound("buttons/button3.wav")
         end)
 
         --Start the recharging timer
         STATUS:AddTimedStatus(self:GetOwner(), "ttt2_deci_cooldown_stat", GetConVar("ttt2_decitester_charge_time"):GetInt(), true)
-          timer.Create("ttt2_decitester_cooldown", GetConVar("ttt2_decitester_charge_time"):GetInt(), 1, function()
-        end)
+        timer.Create("ttt2_decitester_cooldown", GetConVar("ttt2_decitester_charge_time"):GetInt(), 1, function() end)
+      else
+        -- Play a sound to signal player that there was an error testing
+        EmitSound( "buttons/button2.wav", self:GetOwner():GetPos() )
+
+        -- warn them in the corner
+        LANG.Msg("ERROR! Your Minitester is still recharging.", nil, MSG_MSTACK_WARN)
       end
     end
   end
