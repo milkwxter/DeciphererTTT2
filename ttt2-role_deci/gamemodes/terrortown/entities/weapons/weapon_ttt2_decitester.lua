@@ -104,11 +104,9 @@ function SWEP:PrimaryAttack()
 
           -- Create our string and get another color
           local teamStr = hitPlayer:GetName() .. " has been deciphered as a " .. hitString
-          local client = self:GetOwner()
-          local clientColor = client:GetRoleColor()
 
           -- Send a message to the client with relevant information
-          EPOP:AddMessage({text = "Minitester results are in!", color = clientColor}, {text = teamStr, color = hitColor}, 6, nil, true)
+          EPOP:AddMessage("Minitester results are in!", {text = teamStr, color = hitColor}, 6, nil, true)
 
           -- Play a sound to signal timer finished
           surface.PlaySound("buttons/button3.wav")
