@@ -69,11 +69,21 @@ function SWEP:PrimaryAttack()
 
   local hitEnt = tr.Entity
 
-  -- Check if we just hit a player
+  -- Check if we just hit an entity
   if IsValid(hitEnt) then
+    -- Check if that entity was a player
     if hitEnt:IsPlayer() then
-      local teamStr = hitEnt.GetRealTeam()
-      LANG.Msg(owner, teamStr, nil, MSG_MSTACK_WARN)
+      -- Get the player that was hit and the client
+      local hitPlayer = hitEnt
+      local client = self:GetOwner()
+
+      -- Create a string and gather colors
+      local teamStr = hitPlayer:GetName() .. " has been deciphered as a " .. hitPlayer:GetRoleString()
+      local hitColor = hitPlayer:GetRoleColor()
+      local clientColor = client:GetRoleColor()
+
+      -- Send a message to the client
+      EPOP:AddMessage({text = "Minitester results are in!", color = clientColor}, {text = teamStr, color = hitColor}, 6, nil, true)
     end
   end
 end

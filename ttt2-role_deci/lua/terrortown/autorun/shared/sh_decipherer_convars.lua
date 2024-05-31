@@ -22,3 +22,4 @@ table.insert(tbl[ROLE_DECIPHERER], {
       decimal = 0,
       desc = "ttt2_decitester_confirm_time (def. 10)"
 })
+end)
