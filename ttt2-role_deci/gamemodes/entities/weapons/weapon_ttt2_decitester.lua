@@ -40,11 +40,40 @@ SWEP.Primary.Ammo = "none"
 
 SWEP.AllowDrop = false
 
-if SERVER then
-    -- Check if we are looking at a player
+-- Removes the Minitester on death or drop
+function SWEP:OnDrop()
+	self:Remove()
+end
 
-    -- Check the role of the player
+-- Override original primary attack
+function SWEP:PrimaryAttack()
+  -- Melee attack code
+  self:SetNextPrimaryFire( CurTime() + self.Primary.Delay )
+  
+  if not IsValid(self:GetOwner()) then return end
 
-    -- Print it out as a message
+  self:GetOwner():LagCompensation(true)
 
+  local spos = self:GetOwner():GetShootPos()
+  local sdest = spos + (self:GetOwner():GetAimVector() * 70)
+
+  local kmins = Vector(1,1,1) * -10
+  local kmaxs = Vector(1,1,1) * 10
+
+  local tr = util.TraceHull({start=spos, endpos=sdest, filter=self:GetOwner(), mask=MASK_SHOT_HULL, mins=kmins, maxs=kmaxs})
+
+  -- Hull might hit environment stuff that line does not hit
+  if not IsValid(tr.Entity) then
+    tr = util.TraceLine({start=spos, endpos=sdest, filter=self:GetOwner(), mask=MASK_SHOT_HULL})
+  end
+
+  local hitEnt = tr.Entity
+
+  -- Check if we just hit a player
+  if IsValid(hitEnt) then
+    if hitEnt:IsPlayer() then
+      local teamStr = hitEnt.GetRealTeam()
+      LANG.Msg(owner, teamStr, nil, MSG_MSTACK_WARN)
+    end
+  end
 end
