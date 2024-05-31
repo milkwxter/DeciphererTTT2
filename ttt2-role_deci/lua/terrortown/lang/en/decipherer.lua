@@ -17,3 +17,7 @@ L["lang_deci_status_timer_desc"] = "When this timer hits 0, you will find out th
 
 -- WEAPON LANGUAGE STRINGS
 L["lang_deci_weapon_error"] = "ERROR! Your Minitester is still recharging."
+
+-- CONVAR LANGUAGE STRINGS
+L["label_decitester_charge_time"] = "How long should the Minitester recharge take:"
+L["label_decitester_confirm_time"] = "How long should the results take to come in:"

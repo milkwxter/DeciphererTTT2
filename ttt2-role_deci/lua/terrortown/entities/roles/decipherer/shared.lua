@@ -5,7 +5,7 @@ if SERVER then
 end
 
 function ROLE:PreInitialize()
-	self.color = Color(1, 74, 66, 255)
+	self.color = Color(67, 64, 138, 255)
 
 	self.abbr = "deci"
 	self.score.killsMultiplier = 8
@@ -46,7 +46,30 @@ if SERVER then
 
 	-- Remove Loadout on death and rolechange
 	function ROLE:RemoveRoleLoadout(ply, isRoleChange)
-		ply:GiveEquipmentWeapon("weapon_ttt2_decitester")
+		ply:StripWeapon("weapon_ttt2_decitester")
 		ply:RemoveEquipmentItem("item_ttt_armor")
 	end
+end
+
+-- adding convars to the TTT2 menu
+if CLIENT then
+    function ROLE:AddToSettingsMenu(parent)
+        local form = vgui.CreateTTT2Form(parent, "header_roles_additional")
+		
+        form:MakeSlider({
+            serverConvar = "ttt2_decitester_charge_time",
+            label = "label_decitester_charge_time",
+            min = 10,
+            max = 120,
+            decimal = 0,
+        })
+
+		form:MakeSlider({
+            serverConvar = "ttt2_decitester_confirm_time",
+            label = "label_decitester_confirm_time",
+            min = 5,
+            max = 30,
+            decimal = 0,
+        })
+    end
 end
