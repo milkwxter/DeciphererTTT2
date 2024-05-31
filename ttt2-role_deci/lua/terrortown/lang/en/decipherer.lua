@@ -16,3 +16,4 @@ L["lang_deci_status_timer"] = "Minitester results incoming"
 L["lang_deci_status_timer_desc"] = "When this timer hits 0, you will find out the player's role."
 
 -- WEAPON LANGUAGE STRINGS
+L["lang_deci_weapon_error"] = "ERROR! Your Minitester is still recharging."

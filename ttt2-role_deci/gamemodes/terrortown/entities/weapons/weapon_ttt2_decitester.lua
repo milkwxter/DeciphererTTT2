@@ -122,7 +122,7 @@ function SWEP:PrimaryAttack()
         EmitSound( "buttons/button2.wav", self:GetOwner():GetPos() )
 
         -- warn them in the corner
-        LANG.Msg("ERROR! Your Minitester is still recharging.", nil, MSG_MSTACK_WARN)
+        LANG.Msg("lang_deci_weapon_error", nil, MSG_MSTACK_WARN)
       end
     end
   end
