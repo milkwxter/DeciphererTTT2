@@ -49,12 +49,6 @@ if SERVER then
 		ply:StripWeapon("weapon_ttt2_decitester")
 		ply:RemoveEquipmentItem("item_ttt_armor")
 	end
-
-	-- When round begins reset cooldowns to prevent funky business
-	hook.Add("TTTBeginRound", "DeciBeginRound", function()
-		timer.Remove("ttt2_decitester_results_timer")
-		timer.Remove("ttt2_decitester_cooldown")
-	end)
 end
 
 -- adding convars to the TTT2 menu

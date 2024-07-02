@@ -7,7 +7,7 @@ if SERVER then
 	util.AddNetworkString("ttt2_deci_hit_ply")
 
 	-- When this string is broadcasted, we write important info that only the server has
-	hook.Add("TTTGetDeciPly","ttt_get_deci_ply",function(arg)
+	hook.Add("TTTGetDeciPly", "ttt_get_deci_ply", function(arg)
 		net.Start("ttt2_deci_hit_ply")
 		net.WriteString(arg:GetRoleString())
 		net.WriteColor(arg:GetRoleColor())

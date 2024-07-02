@@ -1,5 +1,5 @@
 if SERVER then
-    AddCSLuaFile()
+  AddCSLuaFile()
 	util.AddNetworkString("ttt2_deci_hit_ply")
 end
 
@@ -49,9 +49,7 @@ end
 -- Override original primary attack
 function SWEP:PrimaryAttack()
   -- Check if we are out of ammo
-  if self:Clip1() <= 0 then
-    return
-  end
+  if self:Clip1() <= 0 then return end
   
   -- Melee attack code
   self:SetNextPrimaryFire( CurTime() + self.Primary.Delay )
@@ -75,53 +73,66 @@ function SWEP:PrimaryAttack()
 
   local hitEnt = tr.Entity
 
-  -- Check if we just hit an entity
-  if IsValid(hitEnt) then
-    -- Check if that entity was a player
-    if hitEnt:IsPlayer() then
-      -- Check if the minitester is still charging
-      if not timer.Exists( "ttt2_decitester_cooldown" ) then
-        -- Play a sound to signal timer started
-        EmitSound( "buttons/button5.wav", self:GetOwner():GetPos() )
-        self:SendWeaponAnim( ACT_VM_PRIMARYATTACK)
+  -- Make sure we just hit an entity
+  if not IsValid(hitEnt) then return end
+  -- Make sure that entity was a player
+  if not hitEnt:IsPlayer() then return end
 
-        -- Deduct ammo
-        self:TakePrimaryAmmo( 1 )
-
-        -- Get the player that was hit
-        local hitPlayer = hitEnt
-
-        -- Start the results timer (when its up, we get the results of the test)
-        STATUS:AddTimedStatus(self:GetOwner(), "ttt2_deci_results_timer_stat", GetConVar("ttt2_decitester_confirm_time"):GetInt(), true)
-        -- Run a hook to recieve important information from the server
-        timer.Create("ttt2_decitester_results_timer", GetConVar("ttt2_decitester_confirm_time"):GetInt(), 1, function() hook.Run("TTTGetDeciPly", hitPlayer) end)
-        
-        -- Recieve important information from the server
-        net.Receive("ttt2_deci_hit_ply", function(len)
-          -- Collect information from the server
-          local hitString = net.ReadString()
-          local hitColor = net.ReadColor()
-
-          -- Create our string and get another color
-          local teamStr = hitPlayer:GetName() .. " has been deciphered as a " .. hitString
-
-          -- Send a message to the client with relevant information
-          EPOP:AddMessage("Minitester results are in!", {text = teamStr, color = hitColor}, 6, nil, true)
-
-          -- Play a sound to signal timer finished
-          surface.PlaySound("buttons/button3.wav")
-        end)
-
-        --Start the recharging timer
-        STATUS:AddTimedStatus(self:GetOwner(), "ttt2_deci_cooldown_stat", GetConVar("ttt2_decitester_charge_time"):GetInt(), true)
-        timer.Create("ttt2_decitester_cooldown", GetConVar("ttt2_decitester_charge_time"):GetInt(), 1, function() end)
-      else
-        -- Play a sound to signal player that there was an error testing
-        EmitSound( "buttons/button2.wav", self:GetOwner():GetPos() )
-
-        -- warn them in the corner
-        LANG.Msg("lang_deci_weapon_error", nil, MSG_MSTACK_WARN)
-      end
-    end
+  -- Check if the minitester is still charging
+  if timer.Exists( "ttt2_decitester_cooldown" ) then
+    -- Play a sound to signal player that there was an error testing
+    EmitSound( "buttons/button2.wav", self:GetOwner():GetPos() )
+    -- warn them in the corner
+    LANG.Msg("lang_deci_weapon_error", nil, MSG_MSTACK_WARN)
+    -- leave function early
+    return
   end
+
+  -- Play a sound to signal timer started
+  if SERVER then
+    self:GetOwner():EmitSound( "buttons/button5.wav" )
+  end
+  self:SendWeaponAnim( ACT_VM_PRIMARYATTACK)
+
+  -- tell them who got scanned in the corner
+  LANG.Msg(hitEnt:Nick() .. "'s role is being deciphered. Hold on.", nil, MSG_MSTACK_ROLE)
+
+  -- Deduct ammo
+  self:TakePrimaryAmmo( 1 )
+
+  -- Start the results timer (when its up, we get the results of the test)
+  STATUS:AddTimedStatus(self:GetOwner(), "ttt2_deci_results_timer_stat", GetConVar("ttt2_decitester_confirm_time"):GetInt(), true)
+
+  -- Run a hook to recieve important information from the server
+  timer.Create("ttt2_decitester_results_timer", GetConVar("ttt2_decitester_confirm_time"):GetInt(), 1, function() hook.Run("TTTGetDeciPly", hitEnt) end)
+      
+  -- Recieve important information from the server
+  net.Receive("ttt2_deci_hit_ply", function(len)
+    -- Collect information from the server
+    local hitString = net.ReadString()
+    local hitColor = net.ReadColor()
+    -- Create our string and get another color
+    local teamStr = hitEnt:Nick() .. " has been deciphered as a " .. hitString
+    -- Send a message to the client with relevant information
+    EPOP:AddMessage("Minitester results are in!", {text = teamStr, color = hitColor}, 6, nil, true)
+    -- Play a sound to signal timer finished
+    surface.PlaySound("buttons/button3.wav")
+  end)
+
+  -- Start the recharging timer
+  STATUS:AddTimedStatus(self:GetOwner(), "ttt2_deci_cooldown_stat", GetConVar("ttt2_decitester_charge_time"):GetInt(), true)
+  timer.Create("ttt2_decitester_cooldown", GetConVar("ttt2_decitester_charge_time"):GetInt(), 1, function() end)
+
+  -- End lag compensation
+  self:GetOwner():LagCompensation(false)
 end
+
+-- When round begins/ends reset cooldowns to prevent funky business
+hook.Add("TTTBeginRound", "DeciBeginRound", function()
+	timer.Remove("ttt2_decitester_results_timer")
+	timer.Remove("ttt2_decitester_cooldown")
+end)
+hook.Add("TTTEndRound", "DeciEndRound", function() 
+	timer.Remove("ttt2_decitester_results_timer")
+	timer.Remove("ttt2_decitester_cooldown")
+end)
