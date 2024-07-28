@@ -83,7 +83,9 @@ function SWEP:PrimaryAttack()
     -- Play a sound to signal player that there was an error testing
     EmitSound( "buttons/button2.wav", self:GetOwner():GetPos() )
     -- warn them in the corner
-    LANG.Msg("lang_deci_weapon_error", nil, MSG_MSTACK_WARN)
+    if SERVER then
+      LANG.Msg(self:GetOwner(), "lang_deci_weapon_error", nil, MSG_MSTACK_WARN)
+    end
     -- leave function early
     return
   end
@@ -95,8 +97,9 @@ function SWEP:PrimaryAttack()
   self:SendWeaponAnim( ACT_VM_PRIMARYATTACK)
 
   -- tell them who got scanned in the corner
-  LANG.Msg(hitEnt:Nick() .. "'s role is being deciphered. Hold on.", nil, MSG_MSTACK_ROLE)
-
+  if SERVER then
+    LANG.Msg(self:GetOwner(), hitEnt:Nick() .. "'s role is being deciphered. Hold on.", nil, MSG_MSTACK_ROLE)
+  end
   -- Deduct ammo
   self:TakePrimaryAmmo( 1 )
 
