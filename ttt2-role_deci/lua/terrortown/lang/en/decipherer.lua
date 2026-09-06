@@ -26,7 +26,7 @@ L["ttt2_label_decipherer_uses_left"] = "Uses left: {current}/{maximum}"
 
 -- MINITESTER SWEP LANGUAGE STRINGS
 L["ttt2_label_decipherer_minitester_name"] = "Minitester"
-L["ttt2_label_decipherer_minitester_desc"] = "Use this to scan other terrorists to decipher their role."
+L["ttt2_label_decipherer_minitester_desc"] = "Use this to scan other players to learn their role."
 
 -- MINITESTER MESSAGE LANGUAGE STRINGS
 L["ttt2_label_decipherer_error_no_player"] = "You are not scanning a player."
